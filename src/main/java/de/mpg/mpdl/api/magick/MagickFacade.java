@@ -22,13 +22,38 @@ public class MagickFacade {
 	private static final String DEFAULT_FORMAT = "png";
 
 	/**
+	 * DEfine what operation is done first: Resize (Default), or crop
+	 * 
+	 * @author saquet
+	 *
+	 */
+	public enum Priority {
+		CROP, RESIZE;
+
+		/**
+		 * Return a non null Value. If value is not valid, return default value
+		 * (resize)
+		 * 
+		 * @param value
+		 * @return
+		 */
+		public static Priority nonNullValueOf(String value) {
+			try {
+				return valueOf(value.toUpperCase());
+			} catch (Exception e) {
+				return RESIZE;
+			}
+		}
+	}
+
+	/**
 	 * Constructor: Initialize the runtime and the configuration
 	 */
 	public MagickFacade() {
 		runtime = Runtime.getRuntime();
 		MagickConfiguration config = new MagickConfiguration();
-		CONVERT_CMD = FilenameUtils.concat(config.getImageMagickHome(),
-				CONVERT_CMD);
+		if (config.getImageMagickConvertBin() != null)
+			CONVERT_CMD = config.getImageMagickConvertBin();
 	}
 
 	/**
@@ -44,14 +69,16 @@ public class MagickFacade {
 	 * @throws InterruptedException
 	 */
 	public void convert(InputStream in, OutputStream out, String name,
-			String format, String size, String params) throws IOException,
+			String format, String size, String crop, Priority priority,
+			String params1, String params2) throws IOException,
 			InterruptedException {
 		File temp = File.createTempFile("magick",
 				"".equals(FilenameUtils.getExtension(name)) ? "" : "."
 						+ FilenameUtils.getExtension(name));
 		IOUtils.copy(in, new FileOutputStream(temp));
-		IOUtils.copy(new FileInputStream(convert(temp, format, size, params)),
-				out);
+		IOUtils.copy(
+				new FileInputStream(convert(temp, format, size, crop, priority,
+						params1, params2)), out);
 	}
 
 	/**
@@ -65,10 +92,12 @@ public class MagickFacade {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public File convert(File input, String format, String size, String params)
+	public File convert(File input, String format, String size, String crop,
+			Priority priority, String params1, String params2)
 			throws IOException, InterruptedException {
 		File output = createOutputFile(format);
-		String cmd = generateCommand(input, output, format, size, params);
+		String cmd = generateCommand(input, output, format, size, crop,
+				priority, params1, params2);
 		Process p = runtime.exec(cmd);
 		// Wait until the process is done
 		p.waitFor();
@@ -90,7 +119,7 @@ public class MagickFacade {
 
 	/**
 	 * Generate an Imagemagick command Line following the template:<br/>
-	 * convert -define jpeg:size=SIZE INPUT PARAMS OUTPUT
+	 * convert -define jpeg:size=SIZE PARAMS1 INPUT PARAMS2 OUTPUT
 	 * 
 	 * @param input
 	 * @param output
@@ -100,12 +129,17 @@ public class MagickFacade {
 	 * @return
 	 */
 	private String generateCommand(File input, File output, String format,
-			String size, String params) {
+			String size, String crop, Priority priority, String params1,
+			String params2) {
 
-		params = params != null ? params : "";
-		return CONVERT_CMD + " " + getSizeAsParam(size) + " "
-				+ input.getAbsolutePath() + " " + params + " "
-				+ output.getAbsolutePath();
+		params1 = params1 != null ? params1 : "";
+		params2 = params2 != null ? params2 : "";
+		String resizeAndCrop = priority == Priority.RESIZE ? getSizeAsParam(size)
+				+ " " + getCropAsParam(crop)
+				: getCropAsParam(crop) + " " + getSizeAsParam(size);
+		return (CONVERT_CMD + " " + params1 + " " + input.getAbsolutePath()
+				+ " " + resizeAndCrop + " " + params2 + " " + output
+					.getAbsolutePath()).trim();
 	}
 
 	/**
@@ -117,18 +151,12 @@ public class MagickFacade {
 	private String getSizeAsParam(String size) {
 		if (size == null || "".equals(size))
 			return "";
-		return "-define jpeg:size=" + size;
+		return "-resize " + size;
 	}
 
-	public static void main(String[] args) {
-		MagickFacade m = new MagickFacade();
-		try {
-			m.convert(new File("C:\\Users\\saquet\\Pictures\\Jellyfish.jpg"),
-					"png", "30", "");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private String getCropAsParam(String crop) {
+		if (crop == null || "".equals(crop))
+			return "";
+		return "-crop " + crop;
 	}
-
 }

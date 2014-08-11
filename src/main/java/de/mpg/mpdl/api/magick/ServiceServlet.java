@@ -1,15 +1,27 @@
 package de.mpg.mpdl.api.magick;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.mpg.mpdl.api.magick.MagickFacade.Priority;
+
+/**
+ * Web Service called for using the service
+ * 
+ * @author saquet
+ *
+ */
 public class ServiceServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -1284139955167964710L;
@@ -24,28 +36,39 @@ public class ServiceServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		InputStream in = getInputStream(req);
 		try {
-			URL url = URI.create(req.getParameter("url")).toURL();
-			URLConnection conn = url.openConnection();
-			magick.convert(conn.getInputStream(), resp.getOutputStream(),
-					url.toString(), req.getParameter("format"),
-					req.getParameter("size"), req.getParameter("params"));
+			magick.convert(in, resp.getOutputStream(), "tmp",
+					readParam(req, "format"), readParam(req, "size"),
+					readParam(req, "crop"),
+					Priority.nonNullValueOf(readParam(req, "priority")),
+					readParam(req, "params1"), readParam(req, "params2"));
 		} catch (Exception e) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					e.getMessage());
+			e.printStackTrace();
+		} finally {
+			in.close();
+			resp.getOutputStream().close();
 		}
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		InputStream in = getInputStream(req);
 		try {
-			magick.convert(req.getInputStream(), resp.getOutputStream(), "tmp",
-					req.getParameter("format"), req.getParameter("size"),
-					req.getParameter("params"));
+			magick.convert(in, resp.getOutputStream(), "tmp",
+					readParam(req, "format"), readParam(req, "size"),
+					readParam(req, "crop"),
+					Priority.nonNullValueOf(readParam(req, "priority")),
+					readParam(req, "params1"), readParam(req, "params2"));
 		} catch (Exception e) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					e.getMessage());
+		} finally {
+			in.close();
+			resp.getOutputStream().close();
 		}
 	}
 
@@ -59,6 +82,54 @@ public class ServiceServlet extends HttpServlet {
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	}
+
+	/**
+	 * Read a parameter from the request
+	 * 
+	 * @param req
+	 * @param name
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	private String readParam(HttpServletRequest req, String name)
+			throws UnsupportedEncodingException {
+		String value = req.getParameter(name);
+		if ("crop".equals(name) && value != null) {
+			String notEncodedvalue = repareCropParam(value);
+			if (!notEncodedvalue.equals(value))
+				return notEncodedvalue;
+		}
+		return value == null ? "" : URLDecoder.decode(value, "UTF-8");
+	}
+
+	/**
+	 * When the crop parameter is not encoded, the + are interpreted as a white
+	 * space in the url
+	 * 
+	 * @param crop
+	 * @return
+	 */
+	private String repareCropParam(String crop) {
+		return crop.trim().replace(" ", "+");
+	}
+
+	/**
+	 * Read the input in the request and return it as a stream
+	 * 
+	 * @param req
+	 * @return
+	 * @throws IOException
+	 */
+	private InputStream getInputStream(HttpServletRequest req)
+			throws IOException {
+		if (!readParam(req, "url").equals("")) {
+			URL url = URI.create(req.getParameter("url")).toURL();
+			return url.openConnection().getInputStream();
+		} else if (!readParam(req, "inputFile").equals("")) {
+			return new FileInputStream(new File(readParam(req, "inputFile")));
+		} else
+			throw new RuntimeException("No file to transform");
 	}
 
 }

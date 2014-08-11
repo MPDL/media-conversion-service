@@ -14,6 +14,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class MagickConfiguration {
 
+	public static final String SERVICE_NAME = "magick";
 	private static final String PROPERTIES_FILENAME = "magick-service.properties";
 	private Properties properties = new Properties();
 
@@ -21,14 +22,20 @@ public class MagickConfiguration {
 		load();
 	}
 
+	public String getServiceUrl() {
+		if (properties.containsKey("service.url"))
+			return (String) properties.get("service.url");
+		return "http://localhost:8080/" + SERVICE_NAME;
+	}
+
 	/**
 	 * Return the home directory for imagemagick (important for windows)
 	 * 
 	 * @return
 	 */
-	public String getImageMagickHome() {
-		if (properties.containsKey("imagemagick.home"))
-			return (String) properties.get("imagemagick.home");
+	public String getImageMagickConvertBin() {
+		if (properties.containsKey("imagemagick.convert.bin"))
+			return (String) properties.get("imagemagick.convert.bin");
 		return null;
 	}
 
