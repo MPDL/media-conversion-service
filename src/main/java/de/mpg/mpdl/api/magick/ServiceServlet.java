@@ -2,6 +2,7 @@ package de.mpg.mpdl.api.magick;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -13,6 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
 
 import de.mpg.mpdl.api.magick.MagickFacade.Priority;
 
@@ -48,7 +51,6 @@ public class ServiceServlet extends HttpServlet {
 					e.getMessage());
 			e.printStackTrace();
 		} finally {
-			in.close();
 			resp.getOutputStream().close();
 		}
 	}
@@ -56,9 +58,8 @@ public class ServiceServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		InputStream in = getInputStream(req);
 		try {
-			magick.convert(in, resp.getOutputStream(), "tmp",
+			magick.convert(req.getInputStream(), resp.getOutputStream(), "tmp",
 					readParam(req, "format"), readParam(req, "size"),
 					readParam(req, "crop"),
 					Priority.nonNullValueOf(readParam(req, "priority")),
@@ -67,7 +68,6 @@ public class ServiceServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					e.getMessage());
 		} finally {
-			in.close();
 			resp.getOutputStream().close();
 		}
 	}
