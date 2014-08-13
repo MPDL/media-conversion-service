@@ -23,7 +23,7 @@ The magick service implemtents the method `GET` and `POST`. The parameters are:
 - **size**: As defined by imagemagick [resize](http://www.imagemagick.org/script/command-line-options.php#resize)
 - **crop**:As defined by imagemagick [crop](http://www.imagemagick.org/script/command-line-options.php#crop)
 - **format**: The format in which the file shhould be returned (for instance png, jpg, etc.)
-- **Priority** (size|crop): The method (size of crop) which is processed first (only relevant when resize and crop are both used)
+- **priority** (size|crop): The method (size of crop) which is processed first (only relevant when resize and crop are both used)
 
 
  
