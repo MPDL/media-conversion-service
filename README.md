@@ -12,7 +12,7 @@ Web service to use functionnality of [Imagemagick](http://www.imagemagick.org/).
 4. clone https://github.com/MPDL/magick-service
 5. Compile the service: In service directory, run `mvn clean install`
 6. Copy magick.war in Tomcat Webapp directory
-7. Create File `magick.properties` in Tomcat conf directory
+7. Create File `magick-service.properties` in Tomcat conf directory
 8. Edit `magick.properties` with Property `imagemagick.convert.bin = /path/to/convert` (for instance `/usr/bin/convert`)
 9. Start Tomcat
 10. Service runs under `http://localhost:8080/magick`
