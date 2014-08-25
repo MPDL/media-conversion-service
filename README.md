@@ -15,10 +15,10 @@ Web service to use functionnality of [Imagemagick](http://www.imagemagick.org/).
 7. Create File `magick-service.properties` in Tomcat conf directory
 8. Edit `magick.properties` with Property `imagemagick.convert.bin = /path/to/convert` (for instance `/usr/bin/convert`)
 9. Start Tomcat
-10. Service runs under `http://localhost:8080/magick`
+10. Service runs under `http://localhost:8080/media-conversion`
 
 ### Usage
-The magick service implemtents the method `GET` and `POST`. The parameters are:
+The magick service implemtents the method `GET` and `POST` under the paht `/convert`. The parameters are:
 - **url** (Mandotory for `GET`): the url of the file to be transformed
 - **size**: As defined by imagemagick [resize](http://www.imagemagick.org/script/command-line-options.php#resize)
 - **crop**:As defined by imagemagick [crop](http://www.imagemagick.org/script/command-line-options.php#crop)
