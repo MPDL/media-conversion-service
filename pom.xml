@@ -4,8 +4,8 @@
 	<groupId>de.mpg.mpdl.api</groupId>
 	<packaging>war</packaging>
 	<version>0.1-SNAPSHOT</version>
-	<name>magick-service</name>
-	<url>http://api.mpdl.mpg.de/magick</url>
+	<name>media-conversion-service</name>
+	<url>http://api.mpdl.mpg.de/media-conversion</url>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -31,10 +31,10 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>magick</finalName>
+		<finalName>media-conversion</finalName>
 	</build>
-	<artifactId>magick-service</artifactId>
+	<artifactId>media-conversion</artifactId>
 	<scm>
-		<url>https://github.com/MPDL/magick-service</url>
+		<url>https://github.com/MPDL/media-conversion-service</url>
 	</scm>
 </project>
