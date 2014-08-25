@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -103,8 +105,7 @@ public class MagickFacade {
 		File output = createOutputFile(format);
 		String cmd = generateCommand(input, output, format, size, crop,
 				priority, params1, params2);
-		Process p = runtime.exec(
-				cmd.replace(COMMAMD_SEPARATOR, " "));
+		Process p = runtime.exec(cmd.replace(COMMAMD_SEPARATOR, " "));
 		int res = p.waitFor();
 		if (res != 0) {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -112,6 +113,55 @@ public class MagickFacade {
 			logger.error(out.toString());
 		}
 		return output;
+	}
+
+	/**
+	 * Convert {@link FileItem} {@link List}
+	 * 
+	 * @param items
+	 * @param out
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	public void convert(List<FileItem> items, OutputStream out)
+			throws IOException, InterruptedException {
+		convert(getUploadedFileItem(items).getInputStream(), out,
+				getFieldValue(items, "name"), getFieldValue(items, "format"),
+				getFieldValue(items, "size"), getFieldValue(items, "crop"),
+				Priority.nonNullValueOf(getFieldValue(items, "priority")),
+				getFieldValue(items, "params1"),
+				getFieldValue(items, "params1"));
+	}
+
+	/**
+	 * Return the Field (param) with the given name as a {@link FileItem}
+	 * 
+	 * @param items
+	 * @param name
+	 * @return
+	 */
+	private String getFieldValue(List<FileItem> items, String name) {
+		for (FileItem item : items) {
+			if (item.isFormField() && name.equals(item.getFieldName())) {
+				return item.getString();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Return the file which is uploaded as a {@link FileItem}
+	 * 
+	 * @param items
+	 * @return
+	 */
+	private FileItem getUploadedFileItem(List<FileItem> items) {
+		for (FileItem item : items) {
+			if (!item.isFormField()) {
+				return item;
+			}
+		}
+		return null;
 	}
 
 	/**

@@ -9,12 +9,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 
 import de.mpg.mpdl.api.magick.MagickFacade.Priority;
@@ -55,15 +60,18 @@ public class ConvertServlet extends HttpServlet {
 		}
 	}
 
-	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		try {
-			magick.convert(req.getInputStream(), resp.getOutputStream(), "tmp",
-					readParam(req, "format"), readParam(req, "size"),
-					readParam(req, "crop"),
-					Priority.nonNullValueOf(readParam(req, "priority")),
-					readParam(req, "params1"), readParam(req, "params2"));
+			if (ServletFileUpload.isMultipartContent(req)) {
+				magick.convert(getUploadedFiles(req), resp.getOutputStream());
+			} else {
+				magick.convert(req.getInputStream(), resp.getOutputStream(),
+						"tmp", readParam(req, "format"),
+						readParam(req, "size"), readParam(req, "crop"),
+						Priority.nonNullValueOf(readParam(req, "priority")),
+						readParam(req, "params1"), readParam(req, "params2"));
+			}
 		} catch (Exception e) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					e.getMessage());
@@ -83,6 +91,23 @@ public class ConvertServlet extends HttpServlet {
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	}
+
+	/**
+	 * Read Multipart files from {@link HttpServletRequest}
+	 * 
+	 * @param req
+	 * @return
+	 * @throws IOException
+	 * @throws FileUploadException
+	 */
+	private List<FileItem> getUploadedFiles(HttpServletRequest req)
+			throws IOException, FileUploadException {
+		File repository = File.createTempFile("servlet", null).getParentFile();
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		factory.setRepository(repository);
+		ServletFileUpload fileUpload = new ServletFileUpload(factory);
+		return fileUpload.parseRequest(req);
 	}
 
 	/**
