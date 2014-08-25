@@ -1,8 +1,8 @@
-magick-service
+Media Conversion Service
 ==============
 
 ### Intro
-Web service to use functionnality of [Imagemagick](http://www.imagemagick.org/). So far, the service implements only the [convert](http://www.imagemagick.org/script/convert.php) command
+Web service to use functionnality of [Imagemagick](http://www.imagemagick.org/). The service implements only the [convert](http://www.imagemagick.org/script/convert.php) command
 
 ### Installation
 
