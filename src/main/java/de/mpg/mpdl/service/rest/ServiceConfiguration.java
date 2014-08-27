@@ -14,8 +14,8 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class ServiceConfiguration {
 
-	public static final String SERVICE_NAME = "magick";
-	private static final String PROPERTIES_FILENAME = "magick-service.properties";
+	public static final String SERVICE_NAME = "media-conversion";
+	private static final String PROPERTIES_FILENAME = "media-conversion-service.properties";
 	private Properties properties = new Properties();
 
 	public ServiceConfiguration() {
