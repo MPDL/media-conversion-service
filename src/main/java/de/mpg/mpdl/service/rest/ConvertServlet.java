@@ -1,4 +1,4 @@
-package de.mpg.mpdl.api.magick;
+package de.mpg.mpdl.service.rest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +20,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import de.mpg.mpdl.api.magick.MagickFacade.Priority;
+import de.mpg.mpdl.service.rest.ImageMagickFacade.Priority;
 
 /**
  * Web Service called for using the service
@@ -31,12 +31,12 @@ import de.mpg.mpdl.api.magick.MagickFacade.Priority;
 public class ConvertServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -1284139955167964710L;
-	private MagickFacade magick;
+	private ImageMagickFacade magick;
 
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		magick = new MagickFacade();
+		magick = new ImageMagickFacade();
 	}
 
 	@Override

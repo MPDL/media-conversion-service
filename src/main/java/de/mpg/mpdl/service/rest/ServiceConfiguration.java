@@ -1,4 +1,4 @@
-package de.mpg.mpdl.api.magick;
+package de.mpg.mpdl.service.rest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,13 +12,13 @@ import org.apache.commons.io.FilenameUtils;
  * @author saquet
  *
  */
-public class MagickConfiguration {
+public class ServiceConfiguration {
 
 	public static final String SERVICE_NAME = "magick";
 	private static final String PROPERTIES_FILENAME = "magick-service.properties";
 	private Properties properties = new Properties();
 
-	public MagickConfiguration() {
+	public ServiceConfiguration() {
 		load();
 	}
 

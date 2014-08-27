@@ -1,4 +1,4 @@
-package de.mpg.mpdl.api.magick;
+package de.mpg.mpdl.service.rest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,17 +16,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Facade implementing the calling imagemagick
+ * Facade for <a href="http://www.imagemagick.org">ImageMagick</a>
  * 
  * @author saquet
  *
  */
-public class MagickFacade {
+public class ImageMagickFacade {
 	private static String CONVERT_CMD = "convert";
 	private Runtime runtime;
 	private static final String DEFAULT_FORMAT = "png";
 	private static final String COMMAMD_SEPARATOR = "XXX_SEPARATOR_XXX";
-	private static Logger logger = LoggerFactory.getLogger(MagickFacade.class);
+	private static Logger logger = LoggerFactory
+			.getLogger(ImageMagickFacade.class);
 
 	/**
 	 * DEfine what operation is done first: Resize (Default), or crop
@@ -56,9 +57,9 @@ public class MagickFacade {
 	/**
 	 * Constructor: Initialize the runtime and the configuration
 	 */
-	public MagickFacade() {
+	public ImageMagickFacade() {
 		runtime = Runtime.getRuntime();
-		MagickConfiguration config = new MagickConfiguration();
+		ServiceConfiguration config = new ServiceConfiguration();
 		if (config.getImageMagickConvertBin() != null)
 			CONVERT_CMD = config.getImageMagickConvertBin();
 	}
