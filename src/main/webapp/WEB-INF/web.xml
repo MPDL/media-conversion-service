@@ -7,7 +7,7 @@
 	<display-name>Media Conversion Service</display-name>
 	<servlet>
 		<servlet-name>Convert Servlet</servlet-name>
-		<servlet-class>de.mpg.mpdl.api.magick.ConvertServlet</servlet-class>
+		<servlet-class>de.mpg.mpdl.service.rest.ConvertServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 		<async-supported>true</async-supported>
 	</servlet>
