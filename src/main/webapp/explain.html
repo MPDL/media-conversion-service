@@ -28,6 +28,13 @@
 		<p>
 			Crop output <input type="text" name="crop" value="" size="10">  Defines WIDTH x HEIGHT (in px) and the coordinates (X,Y), for instance: 500x400+50+35
 		</p>
+		<p>
+			Priority (only relevant when size and crop are set)
+			<select name="priority">
+				<option value="size" selected="selected">size (default)</option>
+				<option value="crop">crop</option>
+			</select>
+		</p>
 		<input type="submit" value="Go" /> <input type="reset" value="Reset">
 	</form>
 
@@ -53,6 +60,13 @@
 		</p>
 		<p>
 			Crop output <input type="text" name="crop" value="" size="10">  Defines WIDTH x HEIGHT (in px) and the coordinates (X,Y), for instance: 500x400+50+35
+		</p>
+		<p>
+			Priority (only relevant when size and crop are set)
+			<select name="priority">
+				<option value="size" selected="selected">size (default)</option>
+				<option value="crop">crop</option>
+			</select>
 		</p>
 		<input type="submit" value="Go" /> <input type="reset" value="Reset">
 	</form>
